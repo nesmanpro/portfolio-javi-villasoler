@@ -43,6 +43,20 @@ export default function SplitReveal({
         autoSplit: true,
         onSplit(self) {
           el.classList.remove("split-pending");
+          // Give each line mask vertical breathing room so the springy
+          // overshoot (back.out) doesn't clip ascenders/descenders against
+          // the mask edge. The mask is the line's parent (mask:"lines");
+          // padding it and cancelling that with a negative margin adds clip
+          // room without shifting the layout.
+          for (const line of self.lines) {
+            const mask = line.parentElement;
+            if (mask && mask !== el) {
+              mask.style.paddingTop = "0.2em";
+              mask.style.paddingBottom = "0.2em";
+              mask.style.marginTop = "-0.2em";
+              mask.style.marginBottom = "-0.2em";
+            }
+          }
           const targets =
             type === "lines"
               ? self.lines

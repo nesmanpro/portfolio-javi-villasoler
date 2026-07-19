@@ -7,6 +7,7 @@ import TransitionLink from "@/components/TransitionLink";
 import LocalTime from "@/components/LocalTime";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useHeaderContent } from "@/hooks/useContent";
+import { useIsTouch } from "@/hooks/useIsTouch";
 
 /** Animated thumbnail that grows in width at the left of a menu item on
  *  hover, pushing the label right. Accepts a looping video or a .gif URL. */
@@ -26,6 +27,7 @@ function MenuPreview({ src, alt }: { src?: string; alt: string }) {
 
 export default function Header() {
   const { data: header } = useHeaderContent();
+  const isTouch = useIsTouch();
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
@@ -166,10 +168,16 @@ export default function Header() {
                     <span className="label-mono opacity-40 w-8 shrink-0">
                       0{i + 1}
                     </span>
-                    <MenuPreview
-                      src={item.hoverPreviewVideoUrl}
-                      alt={item.pageLabel}
-                    />
+                    {/* Hover preview pushes the label right as it grows —
+                        only useful with a real pointer. On touch a tap would
+                        leave it stuck open and shove the label off-screen,
+                        so we skip it entirely. */}
+                    {!isTouch && (
+                      <MenuPreview
+                        src={item.hoverPreviewVideoUrl}
+                        alt={item.pageLabel}
+                      />
+                    )}
                     <span
                       className="display"
                       style={{ fontSize: "clamp(3rem, 9vh, 7rem)" }}

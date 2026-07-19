@@ -19,6 +19,7 @@ import {
   transformLoader,
   FALLBACK_LOADER,
   type HeroContent,
+  type ApiHero,
   transformHero,
   FALLBACK_HERO,
   type HeaderContent,
@@ -71,7 +72,9 @@ export function useLoaderContent() {
 }
 
 export function useHeroContent() {
-  return useStrapiContent<Partial<HeroContent>, HeroContent>("hero", {
+  return useStrapiContent<ApiHero, HeroContent>("hero", {
+    // populate so the trailImages media field comes through
+    query: { populate: "*" },
     transform: transformHero,
     fallback: FALLBACK_HERO,
   });

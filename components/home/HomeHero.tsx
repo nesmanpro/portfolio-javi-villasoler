@@ -1,6 +1,7 @@
 "use client";
 
 import SplitReveal from "@/components/SplitReveal";
+import HeroMouseTrail from "@/components/home/HeroMouseTrail";
 import { useHeroContent } from "@/hooks/useContent";
 
 export default function HomeHero() {
@@ -11,7 +12,11 @@ export default function HomeHero() {
       data-theme-section="dark"
       className="relative flex min-h-svh flex-col justify-between px-[4vw] pt-28 pb-6 overflow-hidden"
     >
-      <div className="flex flex-wrap justify-between gap-4">
+      {/* Move the mouse over the hero to fling project thumbnails that fall
+          and bounce away with gravity (madewithgsap.com/codrops). */}
+      <HeroMouseTrail />
+
+      <div className="relative z-10 flex flex-wrap justify-between gap-4">
         <SplitReveal
           as="p"
           trigger="load"
@@ -40,7 +45,7 @@ export default function HomeHero() {
         </SplitReveal>
       </div>
 
-      <div className="flex flex-col justify-end">
+      <div className="relative z-10 flex flex-col justify-end">
         <SplitReveal
           as="h1"
           type="chars"

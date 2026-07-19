@@ -278,8 +278,8 @@ body {
   z-index: 1;
 }
 
-.service-media > video,
-.service-media > img {
+.service-media>video,
+.service-media>img {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -322,17 +322,22 @@ body {
 /* Touch: no media/tagline. Scrolling highlights the service closest to
    the viewport center (.is-active, set from Services.tsx) and dims the
    rest, standing in for the hover state. */
-@media (hover: none), (pointer: coarse) {
+@media (hover: none),
+(pointer: coarse) {
+
   .service-media,
   .service-tag {
     display: none;
   }
 
-  .services-list:has(.service-item.is-active)
-    .service-item:not(.is-active) {
+  .services-list:has(.service-item.is-active) .service-item:not(.is-active) {
     opacity: 0.1;
   }
 }
+
+/* NOTE: the hero gravity mouse-trail (HeroMouseTrail.tsx) is styled with
+   inline styles inside the component, not here — it sidesteps Turbopack's
+   stale-globals.css HMR bug and keeps the whole effect self-contained. */
 
 /* ---------- claim section ---------- */
 
@@ -342,11 +347,9 @@ body {
   z-index: 5;
   display: inline-block;
   white-space: nowrap;
-  font-family: var(--font-sans);
-  font-style: italic;
-  font-weight: 600;
-  text-transform: lowercase;
-  letter-spacing: -0.03em;
+  text-decoration: underline;
+  font-weight: 300;
+  text-transform: uppercase;
   cursor: default;
 }
 

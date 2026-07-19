@@ -38,7 +38,9 @@ export default function Preloader() {
 
   // Resolved from within the GSAP timeline once the intro has played and
   // the image conveyor completed a couple of cycles.
-  const introPlayed = useRef<{ promise: Promise<void>; resolve: () => void }>(null!);
+  const introPlayed = useRef<{ promise: Promise<void>; resolve: () => void }>(
+    null!,
+  );
   if (!introPlayed.current) {
     let resolve!: () => void;
     const promise = new Promise<void>((r) => (resolve = r));
@@ -89,15 +91,23 @@ export default function Preloader() {
       const root = rootRef.current!;
       const chars = root.querySelectorAll<HTMLElement>(".loader-char");
       const fading = root.querySelectorAll<HTMLElement>(
-        ".loader-char:not([data-keep]), .loader-gap"
+        ".loader-char:not([data-keep]), .loader-gap",
       );
       const slot = root.querySelector<HTMLElement>(".loader-slot")!;
-      const slides = root.querySelectorAll<HTMLImageElement>(".loader-slot img");
+      const slides =
+        root.querySelectorAll<HTMLImageElement>(".loader-slot img");
 
-      gsap.set(slides, { yPercent: 110 });
+      gsap.set(slides, {
+        xPercent: -50,
+        yPercent: -50,
+        scale: 0,
+        autoAlpha: 1,
+      });
 
-      // Conveyor: each image enters from below, holds a beat, then shoots
-      // up while the next one comes in underneath. Runs until finish().
+      // Each image POPS in place between the initials (scale 0 → 1 with a
+      // springy overshoot and a slight random tilt), holds a beat, then
+      // snaps away to make room for the next — which starts popping while
+      // the previous is still mid-exit, keeping the rhythm punchy.
       const state = { i: 0 };
       const cycle = () => {
         if (stopped.current) return;
@@ -105,16 +115,29 @@ export default function Preloader() {
         const srcs = imagesRef.current;
         img.src = srcs[state.i % srcs.length];
         state.i += 1;
+        gsap.set(img, {
+          xPercent: -50,
+          yPercent: -50,
+          scale: 0,
+          autoAlpha: 1,
+          rotation: gsap.utils.random(-7, 7),
+        });
         gsap
           .timeline()
-          .fromTo(
+          .to(img, { scale: 1, duration: 0.42, ease: "back.out(2.4)" })
+          .to(
             img,
-            { yPercent: 110 },
-            { yPercent: 0, duration: 0.38, ease: "power3.out" }
-          )
-          .to(img, { yPercent: -110, duration: 0.3, ease: "power3.in" }, "+=0.34");
-        // Next image starts entering exactly when this one starts leaving
-        gsap.delayedCall(0.38 + 0.34, cycle);
+            {
+              scale: 0,
+              autoAlpha: 0,
+              rotation: `+=${gsap.utils.random(-8, 8)}`,
+              duration: 0.26,
+              ease: "back.in(1.8)",
+            },
+            "+=0.34",
+          );
+        // Next pop begins while this one is still shrinking away
+        gsap.delayedCall(0.42 + 0.34 + 0.14, cycle);
       };
 
       gsap
@@ -132,11 +155,7 @@ export default function Preloader() {
         .to(fading, { opacity: 0, duration: 0.32, stagger: 0.015 })
         // 4. …and collapses, pulling the initials together while the image
         //    slot opens up between them (before they fully meet)
-        .to(
-          fading,
-          { width: 0, duration: 0.6, ease: "power4.inOut" },
-          ">-0.08"
-        )
+        .to(fading, { width: 0, duration: 0.6, ease: "power4.inOut" }, ">-0.08")
         .to(
           slot,
           {
@@ -146,7 +165,7 @@ export default function Preloader() {
             duration: 0.6,
             ease: "power4.inOut",
           },
-          "<"
+          "<",
         )
         // 5. First image rises while the slot is still opening
         .call(cycle, undefined, "<+0.28")
@@ -154,7 +173,7 @@ export default function Preloader() {
         //    (it keeps looping if the page is still loading)
         .call(() => introPlayed.current.resolve(), undefined, "+=1.6");
     },
-    { scope: rootRef }
+    { scope: rootRef },
   );
 
   if (done) return null;
@@ -173,7 +192,7 @@ export default function Preloader() {
   return (
     <div
       ref={rootRef}
-      className="curtain-panel fixed z-[100]"
+      className="curtain-panel fixed z-100"
       style={{ top: "-20lvh", left: "-10vw", width: "120vw", height: "140lvh" }}
     >
       <div
@@ -182,16 +201,52 @@ export default function Preloader() {
       >
         <div
           className="loader-name display text-bone"
-          style={{ fontSize: "clamp(2.6rem, 8.5vw, 8.5rem)" }}
+          // overflow:visible so the popping images (taller than the caps)
+          // aren't clipped top/bottom by the name box — the per-letter
+          // reveal still clips itself via each .loader-char.
+          style={{
+            fontSize: "clamp(2.6rem, 8.5vw, 8.5rem)",
+            overflow: "visible",
+            padding: "0.5em 0",
+          }}
           aria-label={`${names.first} ${names.last}`}
         >
           {renderWord(names.first.toUpperCase(), "n")}
           <span className="loader-gap" aria-hidden />
-          <span className="loader-slot" aria-hidden>
+          {/* Inline styles override .loader-slot's clipping window: the
+              cards pop free-floating, slightly bigger than the caps, like
+              the reference — not framed inside a slot. */}
+          <span
+            className="loader-slot"
+            aria-hidden
+            style={{ overflow: "visible", borderRadius: 0 }}
+          >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img alt="" />
+            <img
+              alt=""
+              style={{
+                position: "absolute",
+                left: "50%",
+                top: "50%",
+                width: "1.22em",
+                height: "1.5em",
+                objectFit: "cover",
+                borderRadius: 5,
+              }}
+            />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img alt="" />
+            <img
+              alt=""
+              style={{
+                position: "absolute",
+                left: "50%",
+                top: "50%",
+                width: "1.22em",
+                height: "1.5em",
+                objectFit: "cover",
+                borderRadius: 5,
+              }}
+            />
           </span>
           {renderWord(names.last.toUpperCase(), "s")}
         </div>

@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import type { Project } from "@/lib/projects";
 import TransitionLink from "@/components/TransitionLink";
 import MediaReveal from "@/components/MediaReveal";
 import SplitReveal from "@/components/SplitReveal";
+import { useIsTouch } from "@/hooks/useIsTouch";
 
 interface Props {
   project: Project;
@@ -14,9 +15,27 @@ interface Props {
 
 export default function ProjectCard({ project, index, className = "" }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const isTouch = useIsTouch();
 
   const play = () => videoRef.current?.play().catch(() => {});
   const pause = () => videoRef.current?.pause();
+
+  // Touch has no hover: play each clip while it's in view (and pause it when
+  // it leaves, so the phone isn't decoding every project video at once).
+  useEffect(() => {
+    if (!isTouch) return;
+    const video = videoRef.current;
+    if (!video) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) video.play().catch(() => {});
+        else video.pause();
+      },
+      { threshold: 0.35 }
+    );
+    io.observe(video);
+    return () => io.disconnect();
+  }, [isTouch]);
 
   return (
     <TransitionLink
@@ -24,8 +43,8 @@ export default function ProjectCard({ project, index, className = "" }: Props) {
       label={project.title}
       data-cursor-tag={project.title}
       className={`group block ${className}`}
-      onMouseEnter={play}
-      onMouseLeave={pause}
+      onMouseEnter={isTouch ? undefined : play}
+      onMouseLeave={isTouch ? undefined : pause}
     >
       <div className="relative">
         <MediaReveal parallax className="aspect-[4/3] md:aspect-[16/10]">
@@ -38,9 +57,14 @@ export default function ProjectCard({ project, index, className = "" }: Props) {
             className="h-full w-full object-cover"
           />
         </MediaReveal>
-        {/* Looping clip pops in on hover, framed by the photo behind.
-            Lives outside the parallax wrapper so its inset stays stable. */}
-        <div className="card-video">
+        {/* On a real pointer the clip pops in on hover, framed by the photo.
+            On touch there's no hover, so the video is always shown and
+            autoplays — otherwise you'd never see it. (Inline styles override
+            the .card-video hover rule.) */}
+        <div
+          className="card-video"
+          style={isTouch ? { opacity: 1, transform: "scale(1)" } : undefined}
+        >
           <video
             ref={videoRef}
             src={project.video}

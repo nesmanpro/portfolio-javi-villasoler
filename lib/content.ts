@@ -121,6 +121,15 @@ export interface HeroContent {
   mainTitle: string;
   bottomLeftTagline: string;
   bottomRightScrollHint: string;
+  /** Thumbnails flung by the gravity mouse-trail over the hero. Empty ⇒
+   *  the effect falls back to the project images. */
+  trailImageUrls: string[];
+}
+
+/** Strapi sends the media field as { data: [...] } (v4) or a bare array
+ *  (v5 flattened) depending on populate — accept either shape. */
+export interface ApiHero extends Partial<Omit<HeroContent, "trailImageUrls">> {
+  trailImages?: ApiMediaFile[] | { data?: ApiMediaFile[] } | null;
 }
 
 export const FALLBACK_HERO: HeroContent = {
@@ -131,10 +140,20 @@ export const FALLBACK_HERO: HeroContent = {
   bottomLeftTagline:
     "Crafting films for brands, artists and people with something to say",
   bottomRightScrollHint: "Scroll to explore ↓",
+  // Empty by default: HeroMouseTrail uses the project images until you add
+  // dedicated trail images in the CMS.
+  trailImageUrls: [],
 };
 
-export function transformHero(api: Partial<HeroContent>): HeroContent {
-  return { ...FALLBACK_HERO, ...pickDefined(api) };
+export function transformHero(api: ApiHero): HeroContent {
+  const { trailImages, ...rest } = api;
+  const mediaList = Array.isArray(trailImages)
+    ? trailImages
+    : trailImages?.data ?? [];
+  const trailImageUrls = mediaList
+    .map((media) => strapiMediaUrl(media.formats?.medium ?? media))
+    .filter((url): url is string => Boolean(url));
+  return { ...FALLBACK_HERO, ...pickDefined(rest), trailImageUrls };
 }
 
 /* ============================== header ============================== */
