@@ -124,20 +124,20 @@ export default function Preloader() {
         });
         gsap
           .timeline()
-          .to(img, { scale: 1, duration: 0.42, ease: "back.out(2.4)" })
+          .to(img, { scale: 1, duration: 0.22, ease: "back.out(2.4)" })
           .to(
             img,
             {
               scale: 0,
               autoAlpha: 0,
               rotation: `+=${gsap.utils.random(-8, 8)}`,
-              duration: 0.26,
+              duration: 0.2,
               ease: "back.in(1.8)",
             },
-            "+=0.34",
+            "+=0.24",
           );
         // Next pop begins while this one is still shrinking away
-        gsap.delayedCall(0.42 + 0.34 + 0.14, cycle);
+        gsap.delayedCall(0.22 + 0.14 + 0.1, cycle);
       };
 
       gsap
@@ -145,33 +145,33 @@ export default function Preloader() {
         // 1. Full name appears, letter by letter
         .from(chars, {
           yPercent: 115,
-          duration: 0.85,
-          ease: "power4.out",
-          stagger: 0.035,
+          duration: 0.4,
+          ease: "circ.out",
+          stagger: 0.015,
         })
         // 2. Beat
-        .to({}, { duration: 0.45 })
+        .to({}, { duration: 0.15 })
         // 3. Everything but the initials fades out…
-        .to(fading, { opacity: 0, duration: 0.32, stagger: 0.015 })
+        .to(fading, { opacity: 0, duration: 0.12, stagger: 0.01 })
         // 4. …and collapses, pulling the initials together while the image
         //    slot opens up between them (before they fully meet)
-        .to(fading, { width: 0, duration: 0.6, ease: "power4.inOut" }, ">-0.08")
+        .to(fading, { width: 0, duration: 0.25, ease: "circ.inOut" }, ">-0.06")
         .to(
           slot,
           {
             width: "0.92em",
             marginLeft: "0.08em",
             marginRight: "0.08em",
-            duration: 0.6,
-            ease: "power4.inOut",
+            duration: 0.35,
+            ease: "circ.inOut",
           },
           "<",
         )
         // 5. First image rises while the slot is still opening
-        .call(cycle, undefined, "<+0.28")
+        .call(cycle, undefined, "<+0.2")
         // 6. After ~2 conveyor cycles the loader is allowed to leave
         //    (it keeps looping if the page is still loading)
-        .call(() => introPlayed.current.resolve(), undefined, "+=1.6");
+        .call(() => introPlayed.current.resolve(), undefined, "+=1.25");
     },
     { scope: rootRef },
   );
