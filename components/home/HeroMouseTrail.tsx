@@ -62,6 +62,10 @@ export default function HeroMouseTrail() {
         front.src = srcs[word % srcs.length];
         front.style.zIndex = "2";
         back.style.zIndex = "1";
+        // Hide the previous picture: with transparent PNGs it would
+        // otherwise keep showing through around the new one
+        gsap.killTweensOf(back);
+        gsap.set(back, { autoAlpha: 0 });
         if (!pop) {
           gsap.set(front, { scale: 1, autoAlpha: 1 });
           return;

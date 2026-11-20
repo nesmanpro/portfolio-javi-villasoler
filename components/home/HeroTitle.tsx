@@ -67,13 +67,17 @@ function parseMarkers(raw: string) {
   let text = "";
   const serif: boolean[] = [];
   let on = false;
-  for (const ch of raw) {
-    if (ch === "*") {
+  // A run of asterisks counts as one marker, so *it feels.* and the
+  // markdown-bold habit **it feels.** both work
+  for (const run of raw.split(/(\*+)/)) {
+    if (run.startsWith("*")) {
       on = !on;
       continue;
     }
-    text += ch;
-    if (!/\s/.test(ch)) serif.push(on);
+    for (const ch of run) {
+      text += ch;
+      if (!/\s/.test(ch)) serif.push(on);
+    }
   }
   return { text, serif };
 }
