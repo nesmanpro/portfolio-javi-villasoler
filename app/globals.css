@@ -1,10 +1,15 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-display: var(--font-anton), Impact, "Arial Narrow", sans-serif;
-  --font-sans: var(--font-inter-tight), "Helvetica Neue", Helvetica, Arial,
+  /* One type system for the whole site, the same two families as the hero
+     headline: Archivo (variable width + weight) for everything sans, and
+     Roboto Serif compressed for the serif accents (.serif-accent). The
+     "mono" token is kept as the name of the small-label voice. */
+  --font-display: var(--font-flex), "Helvetica Neue", "Arial Narrow", Arial,
     sans-serif;
-  --font-mono: var(--font-space-mono), "Courier New", monospace;
+  --font-sans: var(--font-flex), "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: var(--font-flex), "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-serif: var(--font-flex-serif), Georgia, serif;
 
   --color-ink: #131313;
   --color-coal: #1c1c1c;
@@ -54,18 +59,29 @@ body {
 /* ---------- typography ---------- */
 .display {
   font-family: var(--font-display);
-  font-weight: 400;
+  /* Condensed bold, like the hero headline */
+  font-weight: 700;
+  font-stretch: 75%;
   text-transform: uppercase;
   /* Keep it tight but ≥0.95 — SplitText line masks clip glyphs below that */
   line-height: 0.95;
-  letter-spacing: 0.005em;
+  letter-spacing: -0.02em;
+}
+
+/* Compressed light serif, the second voice of the hero headline */
+.serif-accent {
+  font-family: var(--font-serif);
+  font-variation-settings: "wdth" 50, "opsz" 144;
+  font-weight: 300;
+  letter-spacing: 0;
 }
 
 .label-mono {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.1em;
   line-height: 1.6;
 }
 
@@ -109,8 +125,9 @@ body {
 .btn-pill {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.1em;
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 0.7em 1.6em;
@@ -260,20 +277,14 @@ body {
   z-index: 2;
 }
 
-/* Media window on a fixed axis: centered on the midpoint between the text
-   center (50vw) and the viewport's left edge, i.e. 25vw. The -4vw offsets
-   the section's px-[4vw] padding. Grows in height around its center. */
+/* Media window: position, size, corner radius and the open/closed state
+   are inline styles set by Services.tsx (it measures the widest title and
+   fits the window in the free space to its left, so titles never run over
+   it). Only the static bits live here. */
 .service-media {
   position: absolute;
-  left: calc(25vw - 4vw);
   top: 50%;
-  transform: translate(-50%, -50%);
-  width: min(20rem, 24vw);
-  height: 0;
-  opacity: 0;
   overflow: hidden;
-  border-radius: 5px;
-  transition: height 0.55s var(--ease-spring), opacity 0.3s ease;
   pointer-events: none;
   z-index: 1;
 }
@@ -285,22 +296,6 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-
-.service-item:hover .service-media {
-  /* width * 3/4 keeps a 4:3 window */
-  height: calc(min(20rem, 24vw) * 0.75);
-  opacity: 1;
-}
-
-/* Tablet (narrower hover devices): media flush with the viewport's left
-   edge, so only its right corners stay rounded */
-@media (max-width: 1279px) {
-  .service-media {
-    left: -4vw;
-    transform: translateY(-50%);
-    border-radius: 0 5px 5px 0;
-  }
 }
 
 /* Short tagline at the right of the title */
@@ -319,6 +314,7 @@ body {
   opacity: 0.7;
 }
 
+
 /* Touch: no media/tagline. Scrolling highlights the service closest to
    the viewport center (.is-active, set from Services.tsx) and dims the
    rest, standing in for the hover state. */
@@ -335,9 +331,10 @@ body {
   }
 }
 
-/* NOTE: the hero gravity mouse-trail (HeroMouseTrail.tsx) is styled with
-   inline styles inside the component, not here — it sidesteps Turbopack's
-   stale-globals.css HMR bug and keeps the whole effect self-contained. */
+/* NOTE: the hero cursor image (HeroMouseTrail.tsx) and headline
+   (HeroTitle.tsx) are styled with inline styles inside the components, not
+   here — it sidesteps Turbopack's stale-globals.css HMR bug and keeps the
+   whole effect self-contained. */
 
 /* ---------- claim section ---------- */
 
@@ -348,6 +345,10 @@ body {
   display: inline-block;
   white-space: nowrap;
   text-decoration: underline;
+  text-decoration-thickness: 0.04em;
+  text-underline-offset: 0.08em;
+  font-family: var(--font-serif);
+  font-variation-settings: "wdth" 50, "opsz" 144;
   font-weight: 300;
   text-transform: uppercase;
   cursor: default;
@@ -422,44 +423,6 @@ body {
 .curtain-panel {
   background: #131313;
   border-radius: 50% 50% 50% 50% / 4.5vh 4.5vh 4.5vh 4.5vh;
-}
-
-/* Centered loader: full name -> initials -> image conveyor between them */
-.loader-name {
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-  padding: 0.14em 0;
-  white-space: pre;
-}
-
-.loader-char {
-  display: inline-block;
-  overflow: hidden;
-}
-
-/* The word gap collapses along with the non-initial letters */
-.loader-gap {
-  display: inline-block;
-  width: 0.28em;
-}
-
-/* Opening between the initials where the images cycle through */
-.loader-slot {
-  position: relative;
-  display: inline-block;
-  width: 0;
-  height: 1em;
-  overflow: hidden;
-  border-radius: 5px;
-}
-
-.loader-slot img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
 
 /* ---------- misc ---------- */

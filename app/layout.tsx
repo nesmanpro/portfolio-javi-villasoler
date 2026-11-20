@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Anton, Inter_Tight, Space_Mono } from "next/font/google";
+import { Archivo, Roboto_Serif } from "next/font/google";
 import "./globals.css";
 import TransitionProvider from "@/components/TransitionProvider";
 import SmoothScroll from "@/components/SmoothScroll";
@@ -8,25 +8,23 @@ import Cursor from "@/components/Cursor";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-const anton = Anton({
-  weight: "400",
+// The site's two typefaces (tokens in globals.css): a variable-width
+// grotesque for everything sans and a compressed serif for accents. In the
+// hero headline their weight reacts to the cursor (see HeroTitle.tsx).
+const archivo = Archivo({
   subsets: ["latin"],
-  variable: "--font-anton",
+  axes: ["wdth"],
+  variable: "--font-flex",
 });
 
-const interTight = Inter_Tight({
+const robotoSerif = Roboto_Serif({
   subsets: ["latin"],
-  variable: "--font-inter-tight",
-});
-
-const spaceMono = Space_Mono({
-  weight: ["400", "700"],
-  subsets: ["latin"],
-  variable: "--font-space-mono",
+  axes: ["wdth", "opsz"],
+  variable: "--font-flex-serif",
 });
 
 export const metadata: Metadata = {
-  title: "Javi Villasoler — Video Director & Editor",
+  title: "Javi Villalba Soler — Video Director & Editor",
   description:
     "Independent video director and editor based in Madrid. Brand films, music videos, commercials and documentaries crafted frame by frame.",
 };
@@ -44,7 +42,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${anton.variable} ${interTight.variable} ${spaceMono.variable} antialiased`}
+      className={`${archivo.variable} ${robotoSerif.variable} antialiased`}
     >
       <body>
         {/* Apply the persisted theme before first paint to avoid a flash */}

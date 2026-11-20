@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const result = await getProjectWithNext(slug);
   if (!result) return {};
   return {
-    title: `${result.project.title} — Javi Villasoler`,
+    title: `${result.project.title} — Javi Villalba Soler`,
     description: result.project.description[0],
   };
 }

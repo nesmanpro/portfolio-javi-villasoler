@@ -1,6 +1,7 @@
 "use client";
 
 import SplitReveal from "@/components/SplitReveal";
+import HeroTitle from "@/components/home/HeroTitle";
 import HeroMouseTrail from "@/components/home/HeroMouseTrail";
 import { useHeroContent } from "@/hooks/useContent";
 
@@ -12,8 +13,7 @@ export default function HomeHero() {
       data-theme-section="dark"
       className="relative flex min-h-svh flex-col justify-between px-[4vw] pt-28 pb-6 overflow-hidden"
     >
-      {/* Move the mouse over the hero to fling project thumbnails that fall
-          and bounce away with gravity (madewithgsap.com/codrops). */}
+      {/* An image card follows the cursor underneath the headline */}
       <HeroMouseTrail />
 
       <div className="relative z-10 flex flex-wrap justify-between gap-4">
@@ -45,21 +45,35 @@ export default function HomeHero() {
         </SplitReveal>
       </div>
 
-      <div className="relative z-10 flex flex-col justify-end">
+      {/* Eyebrow + headline: dead-centre of the hero, above the cursor image */}
+      <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center px-[4vw]">
         <SplitReveal
-          as="h1"
-          type="chars"
+          as="p"
           trigger="load"
-          delay={0.25}
-          duration={1.3}
-          stagger={0.035}
-          className="display text-center"
-          style={{ fontSize: "clamp(3.2rem, 11.5vw, 15rem)" }}
-          key={`t-${hero.mainTitle}`}
+          delay={0.1}
+          className="text-center"
+          style={{
+            // Same compressed serif as the serif words of the headline
+            fontFamily: "var(--font-flex-serif), Georgia, serif",
+            fontVariationSettings: '"wdth" 50, "opsz" 144',
+            fontWeight: 300,
+            fontSize: "clamp(1.6rem, 3.4vw, 3.8rem)",
+            lineHeight: 1,
+            letterSpacing: "0",
+            marginBottom: "0.55em",
+          }}
+          key={`e-${hero.eyebrowText}`}
         >
-          {hero.mainTitle}
+          {hero.eyebrowText.split("\n").map((line, i) => (
+            <span key={i} style={{ display: "block" }}>
+              {line}
+            </span>
+          ))}
         </SplitReveal>
+        <HeroTitle key={`t-${hero.mainTitle}`} title={hero.mainTitle} />
+      </div>
 
+      <div className="relative z-10 flex flex-col justify-end">
         <div
           className="mt-6 flex flex-wrap items-end justify-between gap-4 border-t pt-5"
           style={{ borderColor: "var(--line)" }}

@@ -95,7 +95,7 @@ export interface LoaderContent {
 
 export const FALLBACK_LOADER: LoaderContent = {
   firstName: "Javi",
-  lastName: "Villasoler",
+  lastName: "Villalba Soler",
   imageUrls: [0, 1, 2, 3, 4].map(
     (i) => `https://picsum.photos/seed/loader-${i}/420/480`
   ),
@@ -118,6 +118,11 @@ export interface HeroContent {
   topLeftLabel: string;
   topCenterLabel: string;
   topRightLabel: string;
+  /** Small serif line sitting right above the headline ("\n" = line break) */
+  eyebrowText: string;
+  /** Headline phrase. Split into two balanced lines automatically; put a
+   *  line break in it to choose where it breaks, and wrap words in
+   *  *asterisks* to set them in the serif typeface. */
   mainTitle: string;
   bottomLeftTagline: string;
   bottomRightScrollHint: string;
@@ -136,7 +141,8 @@ export const FALLBACK_HERO: HeroContent = {
   topLeftLabel: "Video director & editor",
   topCenterLabel: "Based in Madrid, working worldwide",
   topRightLabel: "Folio — 2026",
-  mainTitle: "Javi Villasoler",
+  eyebrowText: "Social content,\nvideos & animations",
+  mainTitle: "Make your brand look the way *it feels.*",
   bottomLeftTagline:
     "Crafting films for brands, artists and people with something to say",
   bottomRightScrollHint: "Scroll to explore ↓",
@@ -179,7 +185,7 @@ export interface HeaderContent {
 }
 
 export const FALLBACK_HEADER: HeaderContent = {
-  logoText: "Javi Villasoler",
+  logoText: "Javi Villalba Soler",
   contactButtonLabel: "Let's talk",
   menuContactSectionLabel: "Get in touch",
   contactEmail: "hello@javivillasoler.studio",
@@ -242,7 +248,7 @@ export const FALLBACK_FOOTER: FooterContent = {
   ctaTitleLine1: "Let's work",
   ctaTitleLine2: "together",
   contactEmail: "hello@javivillasoler.studio",
-  copyrightText: "© 2026 Javi Villasoler — All rights reserved",
+  copyrightText: "© 2026 Javi Villalba Soler — All rights reserved",
   backToTopLabel: "Back to top ↑",
   socialLinks: FALLBACK_HEADER.socialLinks,
 };
@@ -526,7 +532,7 @@ export const FALLBACK_STUDIO_PAGE: StudioPageContent = {
   pageEyebrow: "The person behind the lens",
   pageTitle: "Studio",
   portraitVideoUrl: studioVideo,
-  portraitCaption: "Javi Villasoler — Director / Editor",
+  portraitCaption: "Javi Villalba Soler — Director / Editor",
   bioMainParagraph:
     "I started cutting skate clips on a borrowed laptop. Eight years later I direct and edit films for brands and artists across Europe — still with the same obsession: rhythm first, everything else after.",
   bioSecondaryParagraph:
